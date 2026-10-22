@@ -5,7 +5,7 @@ PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS appeals (
  id INTEGER PRIMARY KEY AUTOINCREMENT,
  telegram_user_id INTEGER NOT NULL, username TEXT,
- minecraft_nickname TEXT NOT NULL, ban_reason TEXT NOT NULL, appeal_text TEXT NOT NULL,
+ minecraft_nickname TEXT NOT NULL, ban_date TEXT NOT NULL DEFAULT '', ban_reason TEXT NOT NULL, appeal_text TEXT NOT NULL,
  evidence_json TEXT NOT NULL DEFAULT '[]',
  status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','in_review','approved','rejected','need_info')),
  assigned_moderator_id INTEGER, moderator_note TEXT,
@@ -27,4 +27,8 @@ def connect(path):
     db.execute('PRAGMA busy_timeout=10000')
     return db
 def init_db(path):
-    with connect(path) as db: db.executescript(SCHEMA)
+    with connect(path) as db:
+        db.executescript(SCHEMA)
+        columns = {row['name'] for row in db.execute('PRAGMA table_info(appeals)').fetchall()}
+        if 'ban_date' not in columns:
+            db.execute("ALTER TABLE appeals ADD COLUMN ban_date TEXT NOT NULL DEFAULT ''")

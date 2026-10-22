@@ -29,7 +29,10 @@ def test_create_and_list_own_appeal(monkeypatch,tmp_path):
     setup(monkeypatch,tmp_path)
     with TestClient(main.app) as c:
         h={'X-Telegram-Init-Data':signed('test-token',55)}
-        r=c.post('/api/appeals',headers=h,json={'minecraft_nickname':'Example_123','ban_reason':'Suspicious activity','appeal_text':'Please review the circumstances carefully.'})
+        r=c.post('/api/appeals',headers=h,json={'minecraft_nickname':'Example_123','ban_date':'12 октября','ban_reason':'Suspicious activity','appeal_text':'Please review the circumstances carefully.'})
         assert r.status_code==201
         rows=c.get('/api/appeals',headers=h).json()['items']
         assert len(rows)==1 and rows[0]['telegram_user_id']==55
+        assert rows[0]['ban_date']=='12 октября'
+        duplicate=c.post('/api/appeals',headers=h,json={'minecraft_nickname':'Example_123','ban_reason':'Another reason','appeal_text':'Please review this second appeal carefully.'})
+        assert duplicate.status_code==409
