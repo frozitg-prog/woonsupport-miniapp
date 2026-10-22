@@ -71,7 +71,7 @@
       esc(appeal.id) + ' · ' + esc(appeal.minecraft_nickname) + '</h3><p class="muted">' +
       safeDate(appeal.created_at) + '</p>' + staffInfo + '</div><span class="status ' +
       esc(appeal.status) + '">' + esc(labels[appeal.status] || appeal.status) +
-      '</span></div><p><b>Причина бана:</b> ' + esc(appeal.ban_reason) +
+      '</span></div><p><b>Дата бана:</b> ' + esc(appeal.ban_date || 'Не указана') + '</p><p><b>Причина бана:</b> ' + esc(appeal.ban_reason) +
       '</p><p><b>Апелляция:</b> ' + esc(appeal.appeal_text) + '</p>' +
       (links ? '<p><b>Доказательства:</b> ' + links + '</p>' : '') + note + actions + '</article>';
   }
