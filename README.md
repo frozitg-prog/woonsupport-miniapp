@@ -1,24 +1,29 @@
 # WoonTime Mini App
 
-Telegram Mini App starter for Minecraft ban appeals, built with FastAPI, aiogram, and SQLite.
+Telegram Mini App for Minecraft ban appeals, powered by **Node.js**, Express, Telegraf and SQLite. The current pink / dark graphite WoonTime design remains in `app/static/`.
 
-## Included
-- WoonTime-branded responsive Mini App with a pink / dark graphite visual theme
-- Server-side Telegram Web App initData verification
-- Player appeal submission (nickname, ban date, reason, explanation, evidence links) and history
-- One active appeal per player at a time
-- Role-protected moderator decisions and admin statistics
-- SQLite schema with a safe migration for the optional ban-date field and an audit log
-- Automated API and Telegram-auth tests
+## Features
+- Telegram Web App initData HMAC validation on the server
+- Player appeal submission and appeal history
+- Optional ban date and HTTPS evidence links
+- One active appeal per Telegram account at a time
+- Role-protected moderation queue and decisions
+- Admin statistics and audit log
+- Telegram `/start` button and menu button to open the Mini App
+- Health endpoint at `/health`
 
-## Local run
-1. Copy .env.example to .env and set BOT_TOKEN.
-2. Install: pip install -r requirements.txt
-3. Run: uvicorn app.main:app --host 0.0.0.0 --port 8000
-4. Check /health.
+## Run locally
+1. Use Node.js 20 or newer.
+2. Copy `.env.example` to `.env` and set `BOT_TOKEN`, `WEBAPP_URL`, `ADMIN_IDS`, and `MODERATOR_IDS`.
+3. Run `npm install`.
+4. Run `npm start`.
+5. Check `/health`.
 
-## Deployment
-Use the port assigned by the hosting panel and bind to 0.0.0.0. Configure an HTTPS domain and persistent DATA_DIR on Bothost. Set ADMIN_IDS and MODERATOR_IDS as comma-separated numeric Telegram IDs.
+Set `DATA_DIR` to a persistent directory on the host. Configure the Mini App URL as HTTPS. The server automatically binds to the host-provided `PORT`.
 
-## Security and scope
-Never commit .env, tokens, private IDs, or real application data. The API trusts only validated Telegram initData, not a user ID supplied by the browser. This project does not perform RCON actions or automatic unbans. Automated backups are intentionally excluded. The Mini App uses its own SQLite database; it does not automatically share or migrate records from the separate WoonTime bot database.
+## Important
+- Keep real tokens and private IDs out of GitHub. Never commit `.env`.
+- Telegram authentication is verified server-side; the API does not trust a user ID sent by the browser.
+- This project does not execute RCON commands or automatically unban players.
+- The Mini App uses its own SQLite database; it does not automatically import or share records from the separate main WoonTime bot database.
+- The active deployment entry point is `server.js`, started with `npm start`.
