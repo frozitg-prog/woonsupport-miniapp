@@ -185,6 +185,7 @@
         method: 'POST',
         body: JSON.stringify({
           minecraft_nickname: values.get('minecraft_nickname'),
+          ban_date: values.get('ban_date') || '',
           ban_reason: values.get('ban_reason'),
           appeal_text: values.get('appeal_text'),
           evidence
