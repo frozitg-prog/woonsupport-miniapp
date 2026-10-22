@@ -59,7 +59,7 @@ function validateInitData(initData) {
   if (!hash || !Number.isFinite(authDate)) throw Object.assign(new Error('Invalid Telegram initData'), { status: 401 });
   const now = Math.floor(Date.now() / 1000);
   if (authDate > now + 60 || now - authDate > MAX_AGE) throw Object.assign(new Error('Telegram session expired. Reopen the app.'), { status: 401 });
-  const check = [...params.entries()].filter(([key]) => key !== 'hash').sort(([a], [b]) => a.localeCompare(b)).map(([key, value]) => key + '=' + value).join('\\n');
+  const check = [...params.entries()].filter(([key]) => key !== 'hash').sort(([a], [b]) => a.localeCompare(b)).map(([key, value]) => key + '=' + value).join('\n');
   const secret = crypto.createHmac('sha256', 'WebAppData').update(TOKEN).digest();
   const expected = crypto.createHmac('sha256', secret).update(check).digest('hex');
   const supplied = Buffer.from(hash, 'hex');
@@ -149,7 +149,7 @@ if (TOKEN) {
   bot = new Telegraf(TOKEN);
   bot.start(ctx => {
     if (!WEBAPP_URL.startsWith('https://')) return ctx.reply('Мини-приложение пока не настроено. Укажите HTTPS WEBAPP_URL.');
-    return ctx.reply('👋 Добро пожаловать в WoonTime!\\n\\nЗдесь можно подать апелляцию на бан и следить за её статусом.',
+    return ctx.reply('👋 Добро пожаловать в WoonTime!\n\nЗдесь можно подать апелляцию на бан и следить за её статусом.',
       Markup.inlineKeyboard([Markup.button.webApp('🚀 Открыть WoonTime', WEBAPP_URL)]));
   });
   bot.catch(err => console.error('Telegram bot error:', err));
