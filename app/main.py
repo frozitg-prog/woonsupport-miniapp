@@ -145,3 +145,7 @@ def admin_stats(user: User):
         total=db.execute('SELECT COUNT(*) FROM appeals').fetchone()[0]
         log=db.execute('SELECT id,actor_telegram_id,action,appeal_id,created_at FROM audit_log ORDER BY id DESC LIMIT 50').fetchall()
     return {'total':total,'by_status':{r['status']:r['count'] for r in counts},'recent_audit_log':[dict(r) for r in log]}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host=settings.host, port=settings.port)
