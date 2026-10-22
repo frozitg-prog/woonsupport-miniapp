@@ -24,10 +24,10 @@ async def start_command(message: Message):
         await message.answer("Мини-приложение пока не настроено. Администратор должен указать HTTPS WEBAPP_URL.")
         return
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(text="🚀 Открыть WoonSupport", web_app=WebAppInfo(url=settings.webapp_url))
+        InlineKeyboardButton(text="🚀 Открыть WoonTime", web_app=WebAppInfo(url=settings.webapp_url))
     ]])
     await message.answer(
-        "👋 Добро пожаловать в WoonSupport!\n\n"
+        "👋 Добро пожаловать в WoonTime!\n\n"
         "Здесь можно подать апелляцию на бан и следить за её статусом.",
         reply_markup=keyboard,
     )
@@ -44,7 +44,7 @@ async def lifespan(_app):
         try:
             await bot.set_chat_menu_button(
                 menu_button=MenuButtonWebApp(
-                    text="WoonSupport",
+                    text="WoonTime",
                     web_app=WebAppInfo(url=settings.webapp_url),
                 )
             )
@@ -63,7 +63,7 @@ async def lifespan(_app):
                 pass
         if bot:
             await bot.session.close()
-app = FastAPI(title='WoonSupport Mini App API', version='0.1.0', lifespan=lifespan)
+app = FastAPI(title='WoonTime Mini App API', version='0.1.0', lifespan=lifespan)
 app.mount('/static', StaticFiles(directory=BASE / 'static'), name='static')
 @app.get('/')
 def index(): return FileResponse(BASE / 'static' / 'index.html')
@@ -87,6 +87,7 @@ def require_staff(user):
 
 class AppealCreate(BaseModel):
     minecraft_nickname: str = Field(min_length=2, max_length=32, pattern=r'^[A-Za-z0-9_]+$')
+    ban_date: str = Field(default='', max_length=80)
     ban_reason: str = Field(min_length=2, max_length=500)
     appeal_text: str = Field(min_length=10, max_length=5000)
     evidence: list[str] = Field(default_factory=list, max_length=10)
@@ -114,8 +115,11 @@ def create_appeal(payload: AppealCreate, user: User):
         if not item.startswith('https://') or len(item)>1000: raise HTTPException(422, 'Evidence must use HTTPS links')
         evidence.append(item)
     with connect(settings.database_path) as db:
-        cur=db.execute('INSERT INTO appeals (telegram_user_id,username,minecraft_nickname,ban_reason,appeal_text,evidence_json) VALUES (?,?,?,?,?,?)',
-            (user['user_id'],user['user'].get('username'),payload.minecraft_nickname,payload.ban_reason.strip(),payload.appeal_text.strip(),json.dumps(evidence)))
+        active = db.execute("SELECT id FROM appeals WHERE telegram_user_id=? AND status IN ('pending','in_review','need_info') LIMIT 1", (user['user_id'],)).fetchone()
+        if active:
+            raise HTTPException(409, f'У вас уже есть активная заявка #{active[0]}. Дождитесь решения команды.')
+        cur=db.execute('INSERT INTO appeals (telegram_user_id,username,minecraft_nickname,ban_date,ban_reason,appeal_text,evidence_json) VALUES (?,?,?,?,?,?,?)',
+            (user['user_id'],user['user'].get('username'),payload.minecraft_nickname,payload.ban_date.strip(),payload.ban_reason.strip(),payload.appeal_text.strip(),json.dumps(evidence)))
         appeal_id=cur.lastrowid
         db.execute('INSERT INTO audit_log (actor_telegram_id,action,appeal_id) VALUES (?,?,?)',(user['user_id'],'appeal_created',appeal_id))
     return {'id':appeal_id,'status':'pending'}
