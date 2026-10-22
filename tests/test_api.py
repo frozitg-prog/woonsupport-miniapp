@@ -1,8 +1,9 @@
-import hashlib,hmac,json
+import hashlib,hmac,json,time
 from urllib.parse import urlencode
 from fastapi.testclient import TestClient
 from app import main
-def signed(token,uid,auth_date=1700000000):
+def signed(token,uid,auth_date=None):
+    if auth_date is None: auth_date=int(time.time())
     d={'auth_date':str(auth_date),'user':json.dumps({'id':uid,'first_name':'Test'},separators=(',',':'))}
     check='\n'.join(f'{k}={v}' for k,v in sorted(d.items()))
     secret=hmac.new(b'WebAppData',token.encode(),hashlib.sha256).digest()
