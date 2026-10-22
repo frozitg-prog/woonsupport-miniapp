@@ -1,8 +1,12 @@
+import asyncio
 import json
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated
 from fastapi import Depends, FastAPI, Header, HTTPException, Query
+from aiogram import Bot, Dispatcher, Router
+from aiogram.filters import CommandStart
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo, MenuButtonWebApp
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -12,10 +16,53 @@ from app.telegram_auth import TelegramAuthError, validate_init_data
 
 BASE = Path(__file__).resolve().parent
 settings = get_settings()
+bot_router = Router()
+
+@bot_router.message(CommandStart())
+async def start_command(message: Message):
+    if not settings.webapp_url.startswith("https://"):
+        await message.answer("Мини-приложение пока не настроено. Администратор должен указать HTTPS WEBAPP_URL.")
+        return
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text="🚀 Открыть WoonSupport", web_app=WebAppInfo(url=settings.webapp_url))
+    ]])
+    await message.answer(
+        "👋 Добро пожаловать в WoonSupport!\n\n"
+        "Здесь можно подать апелляцию на бан и следить за её статусом.",
+        reply_markup=keyboard,
+    )
+
 @asynccontextmanager
 async def lifespan(_app):
     init_db(settings.database_path)
-    yield
+    bot = None
+    polling_task = None
+    if settings.bot_token and settings.webapp_url.startswith("https://"):
+        bot = Bot(token=settings.bot_token)
+        dp = Dispatcher()
+        dp.include_router(bot_router)
+        try:
+            await bot.set_chat_menu_button(
+                menu_button=MenuButtonWebApp(
+                    text="WoonSupport",
+                    web_app=WebAppInfo(url=settings.webapp_url),
+                )
+            )
+        except Exception:
+            # The /start inline button remains available if Telegram rejects the menu-button update.
+            pass
+        polling_task = asyncio.create_task(dp.start_polling(bot))
+    try:
+        yield
+    finally:
+        if polling_task:
+            polling_task.cancel()
+            try:
+                await polling_task
+            except asyncio.CancelledError:
+                pass
+        if bot:
+            await bot.session.close()
 app = FastAPI(title='WoonSupport Mini App API', version='0.1.0', lifespan=lifespan)
 app.mount('/static', StaticFiles(directory=BASE / 'static'), name='static')
 @app.get('/')
