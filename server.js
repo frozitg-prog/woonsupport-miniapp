@@ -17,7 +17,7 @@ fs.mkdirSync(dataDir, { recursive: true });
 const db = new Database(path.join(dataDir, 'woontime.sqlite'));
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
-db.exec(\`
+db.exec(`
 CREATE TABLE IF NOT EXISTS appeals (
  id INTEGER PRIMARY KEY AUTOINCREMENT,
  telegram_user_id TEXT NOT NULL, username TEXT,
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS audit_log (
  appeal_id INTEGER, details_json TEXT NOT NULL DEFAULT '{}',
  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
  FOREIGN KEY(appeal_id) REFERENCES appeals(id) ON DELETE SET NULL
-); \`);
+); `);
 const app = express();
 app.disable('x-powered-by');
 app.use(express.json({ limit: '64kb' }));
