@@ -1,9 +1,81 @@
 <!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="light dark"><title>WoonSupport</title><link rel="stylesheet" href="/static/styles.css"><script src="https://telegram.org/js/telegram-web-app.js"></script><script defer src="/static/app.js"></script></head>
-<body><main class="shell"><header class="top"><div class="logo">W</div><div><p class="eyebrow">MINECRAFT SUPPORT</p><h1>WoonSupport</h1></div></header>
-<section class="card welcome"><p class="eyebrow">ЦЕНТР ОБРАЩЕНИЙ</p><h2 id="greeting">Привет!</h2><p class="muted">Подавай апелляции и следи за их статусом.</p><div id="identity" class="identity">Проверяем Telegram…</div></section>
-<nav class="tabs"><button class="tab active" data-view="appeals">Мои заявки</button><button class="tab" data-view="new">Подать заявку</button><button class="tab staff-only hidden" data-view="moderation">Модерация</button><button class="tab admin-only hidden" data-view="admin">Статистика</button></nav>
-<section id="view-appeals" class="view card"><div class="section-heading"><div><p class="eyebrow">ИСТОРИЯ</p><h2>Мои заявки</h2></div><button id="refresh" class="quiet">Обновить</button></div><div id="appeal-list" class="stack"><p class="muted">Загружаем…</p></div></section>
-<section id="view-new" class="view card hidden"><p class="eyebrow">НОВОЕ ОБРАЩЕНИЕ</p><h2>Апелляция бана</h2><form id="appeal-form" class="stack"><label>Ник в Minecraft<input name="minecraft_nickname" required minlength="2" maxlength="32" pattern="[A-Za-z0-9_]+" placeholder="YourNickname"></label><label>Причина бана<textarea name="ban_reason" required minlength="2" maxlength="500" rows="3"></textarea></label><label>Почему бан стоит пересмотреть?<textarea name="appeal_text" required minlength="10" maxlength="5000" rows="5"></textarea></label><label>Ссылки на доказательства<textarea name="evidence" rows="2" placeholder="HTTPS-ссылка на каждой строке"></textarea></label><button class="primary" type="submit">Отправить апелляцию</button><p id="form-message" class="muted" role="status"></p></form></section>
-<section id="view-moderation" class="view card hidden"><p class="eyebrow">КОМАНДА</p><h2>Очередь заявок</h2><div class="filters"><select id="status-filter"><option value="">Все статусы</option><option value="pending">Новые</option><option value="in_review">На рассмотрении</option><option value="need_info">Нужны данные</option><option value="approved">Одобрены</option><option value="rejected">Отклонены</option></select><input id="search" placeholder="Ник или номер"></div><div id="moderation-list" class="stack"></div></section>
-<section id="view-admin" class="view card hidden"><p class="eyebrow">ОБЗОР</p><h2>Статистика</h2><div id="stats" class="stack"></div></section><footer>WoonSupport · Центр поддержки</footer><div id="toast" class="toast hidden" role="status"></div></main></body></html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#17121b">
+  <meta name="color-scheme" content="dark">
+  <title>WoonTime — Support</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script defer src="/static/app.js"></script>
+</head>
+<body>
+  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand-mark" aria-hidden="true"><span>W</span><i></i></div>
+      <div class="brand-copy"><span class="eyebrow">MINECRAFT COMMUNITY</span><h1>Woon<span>Time</span></h1></div>
+      <div class="online-pill"><span></span> SUPPORT</div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="hero-kicker"><span class="sparkle">✦</span> ЦЕНТР ПОДДЕРЖКИ</span>
+        <h2>Твоя история.<br><span>Твой второй шанс.</span></h2>
+        <p>Подавай апелляции, отслеживай решения команды и оставайся частью WoonTime.</p>
+        <div class="hero-user"><div class="avatar" id="avatar">W</div><div><strong id="greeting">Привет, игрок!</strong><small id="identity">Подключаемся к Telegram…</small></div><span class="verified" aria-label="Защищённое подключение">✓</span></div>
+      </div>
+      <div class="hero-art" aria-hidden="true"><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="crystal">W</div><span class="float-star star-a">✦</span><span class="float-star star-b">✧</span><span class="float-dot"></span></div>
+    </section>
+
+    <section class="quick-stats" aria-label="Преимущества">
+      <div class="quick-stat"><span class="stat-icon pink">✧</span><div><strong>Честно</strong><small>Каждая заявка важна</small></div></div>
+      <div class="quick-stat"><span class="stat-icon violet">◷</span><div><strong>Прозрачно</strong><small>Статус всегда под рукой</small></div></div>
+    </section>
+
+    <nav class="tabs" aria-label="Навигация">
+      <button class="tab active" data-view="appeals"><span class="tab-icon">▤</span><span>Мои заявки</span></button>
+      <button class="tab" data-view="new"><span class="tab-icon">＋</span><span>Апелляция</span></button>
+      <button class="tab staff-only hidden" data-view="moderation"><span class="tab-icon">◈</span><span>Модерация</span></button>
+      <button class="tab admin-only hidden" data-view="admin"><span class="tab-icon">▥</span><span>Обзор</span></button>
+    </nav>
+
+    <section id="view-appeals" class="view panel">
+      <div class="section-heading"><div><span class="eyebrow">ТВОЯ АКТИВНОСТЬ</span><h2>Мои заявки <span class="heading-spark">✦</span></h2><p class="section-subtitle">Вся история обращений в одном месте.</p></div><button id="refresh" class="icon-button" aria-label="Обновить заявки">↻</button></div>
+      <div id="appeal-list" class="stack"><div class="loading"><span class="spinner"></span> Загружаем заявки…</div></div>
+      <button class="primary full-width" data-go="new"><span>＋</span> Создать апелляцию</button>
+    </section>
+
+    <section id="view-new" class="view panel hidden">
+      <div class="section-heading"><div><span class="eyebrow">НОВОЕ ОБРАЩЕНИЕ</span><h2>Расскажи свою сторону</h2><p class="section-subtitle">Заполни форму подробно — так команде будет проще разобраться.</p></div><div class="section-badge">01 <span>/ 01</span></div></div>
+      <div class="form-note"><span>♡</span><p><strong>Небольшая просьба</strong><br>Будь честен и добавь все важные детали. Решение принимает команда WoonTime.</p></div>
+      <form id="appeal-form" class="stack">
+        <label><span class="field-title">Ник в Minecraft <em>обязательно</em></span><input name="minecraft_nickname" required minlength="2" maxlength="32" pattern="[A-Za-z0-9_]+" autocomplete="off" placeholder="Например, WoonPlayer"><small class="field-hint">Только латинские буквы, цифры и _</small></label>
+        <label><span class="field-title">Причина бана <em>обязательно</em></span><textarea name="ban_reason" required minlength="2" maxlength="500" rows="3" placeholder="Что указано в причине блокировки?"></textarea></label>
+        <label><span class="field-title">Твоя апелляция <em>обязательно</em></span><textarea name="appeal_text" required minlength="10" maxlength="5000" rows="5" placeholder="Опиши ситуацию и почему считаешь, что бан стоит пересмотреть…"></textarea><small class="field-hint">Минимум 10 символов. Чем яснее объяснение, тем лучше.</small></label>
+        <label><span class="field-title">Доказательства <span class="optional">необязательно</span></span><textarea name="evidence" rows="2" placeholder="Добавь HTTPS-ссылки, каждую с новой строки"></textarea><small class="field-hint">Скриншоты, видео или другие полезные материалы.</small></label>
+        <button class="primary full-width" type="submit"><span>✦</span> Отправить апелляцию <span class="button-arrow">↗</span></button>
+        <p id="form-message" class="form-message" role="status"></p>
+      </form>
+    </section>
+
+    <section id="view-moderation" class="view panel hidden">
+      <div class="section-heading"><div><span class="eyebrow">WOONTIME TEAM</span><h2>Очередь заявок</h2><p class="section-subtitle">Рабочее пространство модерации.</p></div><span class="section-badge">STAFF</span></div>
+      <div class="filters"><select id="status-filter" aria-label="Фильтр по статусу"><option value="">Все статусы</option><option value="pending">Новые</option><option value="in_review">На рассмотрении</option><option value="need_info">Нужны данные</option><option value="approved">Одобрены</option><option value="rejected">Отклонены</option></select><input id="search" aria-label="Поиск заявки" placeholder="Ник или номер"></div>
+      <div id="moderation-list" class="stack"></div>
+    </section>
+
+    <section id="view-admin" class="view panel hidden">
+      <div class="section-heading"><div><span class="eyebrow">ПАНЕЛЬ АДМИНИСТРАТОРА</span><h2>Обзор сервера</h2><p class="section-subtitle">Сводка обращений и недавние действия.</p></div><span class="section-badge">ADMIN</span></div>
+      <div id="stats" class="stack"></div>
+    </section>
+
+    <footer class="footer"><div class="footer-mark">W</div><div><strong>WoonTime <span>Support</span></strong><small>С заботой о нашем комьюнити</small></div><span class="footer-heart">♥</span></footer>
+    <div id="toast" class="toast hidden" role="status"></div>
+  </main>
+</body>
+</html>
